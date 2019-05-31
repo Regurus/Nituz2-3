@@ -1,7 +1,7 @@
 package com.company;
 
     public class StatusAdvanced extends State{
-        public StatusAdvanced(MainState parent) {
+        StatusAdvanced(MainState parent) {
             this.parent = parent;
         }
 
@@ -13,10 +13,10 @@ package com.company;
         @Override
         public void refreshStatus() {
             if(Main.statusPoints >7){
-                parent.setState("statusPoints","professional");
+                parent.setState("status","professional");
             }
             else if(Main.statusPoints <=4){
-                parent.setState("statusPoints","starter");
+                parent.setState("status","starter");
             }
         }
 

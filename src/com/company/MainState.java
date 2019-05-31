@@ -1,9 +1,11 @@
 package com.company;
 
 public interface MainState {
-    public void setState(String type, String key);
-
-    public State getActiveState(String subsys);
-
-    public void doTheThing();
+    void setState(String type, String key);
+    State getActiveState(String subsys);
+    void doTheThing();
+    boolean getBlocked(String subsys);
+    void setBlocked(String subsys,boolean val);
+    void enter();
+    void exit();
 }

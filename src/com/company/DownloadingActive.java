@@ -2,7 +2,7 @@ package com.company;
 
 public class DownloadingActive extends State{
     private boolean abort = false;
-    public DownloadingActive(MainState parent) {
+    DownloadingActive(MainState parent) {
         this.parent = parent;
     }
 
@@ -22,18 +22,22 @@ public class DownloadingActive extends State{
                     }
                     if(Main.downloadError){
                         parent.setState("download","error");
+                        return;
                     }
                     if(abort){
                         this.parent.getActiveState("drive").cancelFile();
                         Main.currentDownload=0;
                         abort=false;
-                        break;
+                        this.parent.setState("download","idle");
+                        return;
                     }
                 }
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            Main.statusPoints++;
+            this.parent.setBlocked("download",false);
             this.parent.setState("download","idle");
 
         });
@@ -42,11 +46,21 @@ public class DownloadingActive extends State{
 
     @Override
     public void acceptFile() {
-        super.acceptFile();
+        q.add(new Object());
+    }
+
+    @Override
+    public void fileRequest() {
+        parent.getActiveState("drive").fileRequest();
     }
 
     @Override
     public void abortDownload() {
+        Main.statusPoints--;
         this.abort=true;
+    }
+    @Override
+    public void printCurrentState() {
+        System.out.println("Download:Active");
     }
 }

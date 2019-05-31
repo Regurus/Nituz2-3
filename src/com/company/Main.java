@@ -9,13 +9,14 @@ public class Main {
     private static MainState current;
     private static MainState offState;
     private static MainState onState;
-    public static boolean downloadError = false;
-    public static int statusPoints = 0;
-    public static int currentMemory = 100;
-    public static double currentDownload = 0;
+    static boolean downloadError = false;
+    static boolean paused = false;
+    static int statusPoints = 0;
+    static int currentMemory = 100;
+    static double currentDownload = 0;
 
     private enum Command{EXIT,TURNON,TURNOFF,INTERNETON,INTERNETOFF,FILEREQUEST,DOWNLOADABORTED,DOWNLOADERROR,
-        ERRORFIXED,MOVIEON,RESTARTMOVIE,HOLDMOVIE,MOVIEOFF,RESUME,STATUS};//always in upper case for parsing
+        ERRORFIXED,MOVIEON,RESTARTMOVIE,HOLDMOVIE,MOVIEOFF,RESUME,STATUS}//always in upper case for parsing
     public static void main(String[] args) {
         offState = new MainStateOff();
         onState = new MainStateOn();
@@ -24,7 +25,7 @@ public class Main {
         while (!exit){
             String command;
             Scanner sc = new Scanner(System. in);
-            System. out. println("Enter a command");
+            System. out. println("Enter a command >>");
             command = sc. nextLine();
             processCommand(command);
         }
@@ -51,11 +52,12 @@ public class Main {
                     System.out.println("exit " + offState.getClass().getName().split(Pattern.quote("."))[2]+" state");
                     current = onState;
                     System.out.println("enter " + current.getClass().getName().split(Pattern.quote("."))[2]+" state");
-
+                    current.enter();
                 }
                 break;
             case TURNOFF:
                 if(current!=offState){
+                    current.exit();
                     System.out.println("exit " + onState.getClass().getName().split(Pattern.quote("."))[2]+" state");
                     current = offState;
                     System.out.println("enter " + current.getClass().getName().split(Pattern.quote("."))[2]+" state");
@@ -68,20 +70,26 @@ public class Main {
                 current.getActiveState("internet").turnInternetOn();
                 break;
             case RESUME:
+                paused=false;
                 break;
             case MOVIEON:
+                current.getActiveState("watching").watchCurrent();
                 break;
             case MOVIEOFF:
+                current.getActiveState("watching").cancelWatching();
                 break;
             case HOLDMOVIE:
+                paused = true;
                 break;
             case ERRORFIXED:
-                downloadError = true;
+                downloadError = false;
                 break;
             case FILEREQUEST:
+                current.getActiveState("status").refreshStatus();
                 current.getActiveState("download").fileRequest();
                 break;
             case RESTARTMOVIE:
+                current.getActiveState("watching").restartWatching();
                 break;
             case DOWNLOADERROR:
                 downloadError = true;

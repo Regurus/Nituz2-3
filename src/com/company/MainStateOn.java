@@ -4,20 +4,33 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class MainStateOn implements MainState {
-    HashMap<String,HashMap> states;
-    HashMap<String,State> active;
-    HashMap<String,Boolean> blocked;
+    private HashMap<String,HashMap> states;
+    private HashMap<String,State> active;
+    private HashMap<String,Boolean> blocked;
 
-    public MainStateOn() {
-        this.states = new HashMap<>();
-        this.active = new HashMap<>();
-        this.blocked = new HashMap<>();
-        //internet init
+    @Override
+    public void enter() {
         this.initInternetSubsys();
         this.initStatusSubsys();
         this.initDriveSubsys();
         this.initWatchingSubsys();
         this.initDownloadSubsys();
+    }
+
+    @Override
+    public void exit() {
+        for(State s: this.active.values()){
+            System.out.println("exit " + s.getClass().getName().split(Pattern.quote("."))[2]+" state");
+        }
+        this.active = new HashMap<>();
+    }
+
+    MainStateOn() {
+        this.states = new HashMap<>();
+        this.active = new HashMap<>();
+        this.blocked = new HashMap<>();
+        //internet init
+
     }
     @Override
     public void setState(String type, String key) {
@@ -35,6 +48,12 @@ public class MainStateOn implements MainState {
             newState.activateState();
         }
     }
+    public boolean getBlocked(String subsys){
+        return this.blocked.get(subsys);
+    }
+    public void setBlocked(String subsys,boolean val){
+        this.blocked.replace(subsys,val);
+    }
     private void initInternetSubsys(){
         HashMap internet = new HashMap<String,State>();
         this.states.put("internet",internet);
@@ -42,7 +61,7 @@ public class MainStateOn implements MainState {
         internet.put("ON",intOn);
         State intOff = new InternetOff(this);
         internet.put("OFF",intOff);
-        this.setState("internet","ON");
+        this.setState("internet","OFF");
         this.blocked.put("internet",false);
     }
     private void initStatusSubsys(){

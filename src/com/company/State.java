@@ -1,7 +1,10 @@
 package com.company;
 
+import java.util.LinkedList;
+
 public abstract class State {
     protected MainState parent;
+    static LinkedList q = new LinkedList();
 
     public void turnInternetOff(){
         System.out.println("Action is impossible");
@@ -32,4 +35,7 @@ public abstract class State {
         System.out.println("Action is impossible");
     }
     public void abortDownload(){ System.out.println("Action is impossible"); }
+    public void watchCurrent(){ System.out.println("Action is impossible"); }
+    public void cancelWatching(){ System.out.println("Action is impossible"); }
+    public void restartWatching(){System.out.println("Action is impossible");}
 }

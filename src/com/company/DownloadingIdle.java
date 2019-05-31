@@ -1,7 +1,7 @@
 package com.company;
 
 public class DownloadingIdle extends State{
-    public DownloadingIdle(MainState parent) {
+    DownloadingIdle(MainState parent) {
         this.parent = parent;
     }
 
@@ -11,8 +11,18 @@ public class DownloadingIdle extends State{
     }
     @Override
     public void acceptFile() {
-        if(this.parent.getActiveState("internet") instanceof InternetOn)
+        q.add(new Object());
+        if(!parent.getBlocked("download")){
+            this.processRequest();
+        }
+    }
+    private void processRequest(){
+        q.poll();
+        parent.getActiveState("status").refreshStatus();
+        if(this.parent.getActiveState("internet") instanceof InternetOn){
             this.parent.setState("download","downloading");
+            this.parent.setBlocked("download",true);
+        }
         else
             System.out.println("No internet connection!");
     }
@@ -20,5 +30,18 @@ public class DownloadingIdle extends State{
     @Override
     public void abortDownload() {
         System.out.println("Nothing to abort!");
+    }
+
+    @Override
+    public void activateState() {
+        if(q.peek()!=null){
+            this.processRequest();
+        }
+
+    }
+
+    @Override
+    public void printCurrentState() {
+        System.out.println("Download:Idle");
     }
 }
